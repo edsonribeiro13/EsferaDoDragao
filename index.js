@@ -58,9 +58,9 @@ function geraMapa() {
         
         for (let j = 0; j < mapa[i].length; j++) {
             const quadro = document.createElement('td')
-            const objeto = criaObjetoMapa(mapa[i][j])
+            const objeto = criaObjetoMapa(mapa[i][j], i, j)
             quadro.id = `${i}${j}`
-            quadro.style.backgroundColor = objeto.cor
+            quadro.style.backgroundColor = objeto.color
             
             row.appendChild(quadro)
             mapaSetado[i].push(objeto)
@@ -73,37 +73,16 @@ function geraMapa() {
  * @param quadro string que representa uma célula do mapa
  * @returns objeto com informações relevantes para o quadro
  */
-function criaObjetoMapa(quadro) {
+function criaObjetoMapa(quadro, x, y) {
     switch(quadro) {
         case 'V':
-            return {
-                peso: 1,
-                cor: '#92d050',
-                visitado: false,
-                esfera: false,
-            }
+            return new Node(x, y, 1, '#92d050')
         case 'M':
-            return {
-                peso: 60,
-                cor: '#948a54',
-                visitado: false,
-                esfera: false,
-            }
-        case 'A': {
-            return {
-                peso: 10,
-                cor: '#548dd4',
-                visitado: false,
-                esfera: false,
-            }
-        }
+            return new Node(x, y, 60, '#948a54')
+        case 'A': 
+            return new Node(x, y, 10, '#548dd4') 
         default:
-            return {
-                peso: 0,
-                cor: '#c0504d',
-                visitado: false,
-                esfera: false,
-            }
+            return new Node(x, y, 0, '#c0504d')
     }
 }
 
@@ -125,10 +104,12 @@ function randomizaPosicaoEsferas() {
 }
 
 class Node {
-    constructor(x, y, weight) {
+    constructor(x, y, weight, color) {
         this.x = x;
         this.y = y;
         this.weight = weight;
+        this.color = color;
+        this.esfera = false;
         this.f = 0;
         this.g = 0;
         this.h = 0;
@@ -227,20 +208,6 @@ function heuristic(node, end) {
     // Use Manhattan distance as the heuristic
     return Math.abs(node.x - end.x) + Math.abs(node.y - end.y);
 }
-
-// Example usage
-const grid = [
-    [new Node(0, 0, 1), new Node(0, 1, 1), new Node(0, 2, 1)],
-    [new Node(1, 0, 1), new Node(1, 1, 1), new Node(1, 2, 1)],
-    [new Node(2, 0, 1), new Node(2, 1, 1), new Node(2, 2, 1)]
-];
-
-const start = grid[0][0];
-const end = grid[2][2];
-const path = astar(start, end, grid);
-
-console.log(path);
-
 
 geraMapa()
 randomizaPosicaoEsferas()
