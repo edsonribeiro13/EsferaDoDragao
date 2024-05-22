@@ -42,10 +42,14 @@ const mapa = [
     'AVVVVVVVVMVVVVVVVVMVVVVVVMVMVVVMMVMMVVMVAA',
     'AVMMVVMMVVVVVMVMMVVVMMVMVVVVVMVVVVVVMVVVAA'
 ]
+const mapaSetado = []
+const qntEsferas = 7
 
+/**
+ * @satisfies gera mapa e informações do mapa
+ */
 function geraMapa() {
     const table = document.getElementById('mapa')
-    const mapaSetado = []
     
     for(let i = 0; i < mapa.length; i++) {
         const row = document.createElement('tr')
@@ -62,10 +66,13 @@ function geraMapa() {
             mapaSetado[i].push(objeto)
         }
     }
-
-    console.log(mapaSetado)
 }
 
+/**
+ * @satisfies gera objeto do mapa a partir de string
+ * @param quadro string que representa uma célula do mapa
+ * @returns objeto com informações relevantes para o quadro
+ */
 function criaObjetoMapa(quadro) {
     switch(quadro) {
         case 'V':
@@ -73,18 +80,21 @@ function criaObjetoMapa(quadro) {
                 peso: 1,
                 cor: '#92d050',
                 visitado: false,
+                esfera: false,
             }
         case 'M':
             return {
                 peso: 60,
                 cor: '#948a54',
                 visitado: false,
+                esfera: false,
             }
         case 'A': {
             return {
                 peso: 10,
                 cor: '#548dd4',
                 visitado: false,
+                esfera: false,
             }
         }
         default:
@@ -92,8 +102,27 @@ function criaObjetoMapa(quadro) {
                 peso: 0,
                 cor: '#c0504d',
                 visitado: false,
+                esfera: false,
             }
     }
 }
 
+/**
+ * @satisfies gera posições randômicas para as esferas
+ */
+function randomizaPosicaoEsferas() {
+    for(let i = 0; i < qntEsferas; i++) {
+        const linha = Math.floor(Math.random() * 42)
+        const coluna = Math.floor(Math.random() * 42)
+
+        if (mapaSetado[linha][coluna].esfera) {
+            i--
+            continue
+        }
+
+        mapaSetado[linha][coluna].esfera = true
+    }
+}
+
 geraMapa()
+randomizaPosicaoEsferas()
