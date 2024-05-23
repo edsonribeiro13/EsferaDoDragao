@@ -70,8 +70,6 @@ function geraMapa() {
 
 /**
  * @satisfies gera objeto do mapa a partir de string
- * @param quadro string que representa uma célula do mapa
- * @returns objeto com informações relevantes para o quadro
  */
 function criaObjetoMapa(quadro, x, y) {
     switch(quadro) {
@@ -103,6 +101,23 @@ function randomizaPosicaoEsferas() {
     }
 }
 
+function randomizaInicioFimCaminho() {
+    const linhaInicio = 19
+    const colunaInicio = 19
+    let linhaFim = linhaInicio
+    let colunaFim = colunaInicio
+
+    while(linhaFim === linhaInicio && colunaFim === colunaInicio) {
+        linhaFim = Math.floor(Math.random() * 42)
+        colunaFim = Math.floor(Math.random() * 42)
+    }
+
+    return {
+        linhaFim,
+        colunaFim,
+    }
+}
+
 class Node {
     constructor(x, y, weight, color) {
         this.x = x;
@@ -117,6 +132,9 @@ class Node {
     }
 }
 
+/**
+ * @satisfies realiza busca com algoritmo A*
+ */
 function astar(start, end, grid) {
     const openList = [];
     const closedList = [];
@@ -178,6 +196,9 @@ function astar(start, end, grid) {
     return [];
 }
 
+/**
+ * @satisfies Busca vizinhos do nó
+ */
 function getNeighbors(node, grid) {
     const neighbors = [];
     const directions = [
@@ -200,14 +221,37 @@ function getNeighbors(node, grid) {
     return neighbors;
 }
 
+/**
+ * @satisfies Verifica se nó é válido
+ */
 function isValid(x, y, grid) {
     return x >= 0 && y >= 0 && x < grid.length && y < grid[0].length;
 }
 
+/**
+ * @satisfies cria heurística do algoritmo
+ */
 function heuristic(node, end) {
     // Use Manhattan distance as the heuristic
     return Math.abs(node.x - end.x) + Math.abs(node.y - end.y);
 }
 
+async function pintaMapaComCaminho(nodeArray) {
+    for(const node of nodeArray) {
+        const quadro = document.getElementById(`${node.x}${node.y}`)
+        quadro.style.backgroundColor = '#c0504d'
+        await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+}
+
 geraMapa()
 randomizaPosicaoEsferas()
+const posicoes = randomizaInicioFimCaminho()
+const path = astar(
+    mapaSetado[19][19], 
+    mapaSetado[posicoes.linhaFim][posicoes.colunaFim],
+    mapaSetado
+)
+pintaMapaComCaminho(path)
+
+console.log(path)
