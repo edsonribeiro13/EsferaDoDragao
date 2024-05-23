@@ -135,7 +135,7 @@ class Node {
 /**
  * @satisfies realiza busca com algoritmo A*
  */
-function astar(start, end, grid) {
+function astar(start, end, grid, ignoraVizinho) {
     const openList = [];
     const closedList = [];
     openList.push(start);
@@ -167,6 +167,10 @@ function astar(start, end, grid) {
 
         // Get the current node's neighbors
         const neighbors = getNeighbors(currentNode, grid);
+        const neighborComEsfera = neighbors.filter(neighbor => neighbor.esfera)
+        if (neighborComEsfera.length && !ignoraVizinho) {
+            return astar(start, neighborComEsfera[0], mapaSetado, true)
+        }
         for (let neighbor of neighbors) {
             if (closedList.includes(neighbor)) {
                 continue;
@@ -240,7 +244,7 @@ async function pintaMapaComCaminho(nodeArray) {
     for(const node of nodeArray) {
         const quadro = document.getElementById(`${node.x}${node.y}`)
         quadro.style.backgroundColor = '#c0504d'
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
     }
 }
 
@@ -253,5 +257,3 @@ const path = astar(
     mapaSetado
 )
 pintaMapaComCaminho(path)
-
-console.log(path)
