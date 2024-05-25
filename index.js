@@ -98,6 +98,7 @@ function randomizaPosicaoEsferas() {
         }
 
         mapaSetado[linha][coluna].esfera = true
+        mapaSetado[linha][coluna].numeroEsfera = i + 1
         const quadro = document.getElementById(`${linha}${coluna}`)
         quadro.style.backgroundImage = `url(./esfera${i+1}.jpg)`
         quadro.style.backgroundSize = '100% 100%'
@@ -110,7 +111,7 @@ function randomizaInicioFimCaminho() {
     let linhaFim = linhaInicio
     let colunaFim = colunaInicio
 
-    while(linhaFim === linhaInicio && colunaFim === colunaInicio) {
+    while(linhaFim === linhaInicio && colunaFim === colunaInicio && !mapaSetado[linhaFim][colunaFim].visitado) {
         linhaFim = Math.floor(Math.random() * 42)
         colunaFim = Math.floor(Math.random() * 42)
     }
@@ -128,6 +129,7 @@ class Node {
         this.weight = weight;
         this.color = color;
         this.esfera = false;
+        this.numeroEsfera = 0;
         this.visitado = false;
         this.f = 0;
         this.g = 0;
@@ -161,17 +163,21 @@ function astar(start, end, grid, ignoraVizinho) {
 
         // If we reached the end node, reconstruct the path and return it
         if (currentNode.x === end.x && currentNode.y === end.y) {
-            if (ignoraVizinho)
+            let numeroEsfera = 0
+            if (ignoraVizinho) {
                 currentNode.visitado = true
+                numeroEsfera = currentNode.numeroEsfera
+            }
             const path = [];
             let temp = currentNode;
             while (temp) {
-                path.push({ x: temp.x, y: temp.y });
+                path.push(temp);
                 temp = temp.parent;
             }
             return {
                 caminho: path.reverse(),
-                ignoraVizinho
+                ignoraVizinho,
+                numeroEsfera,
             }
         }
 
@@ -262,18 +268,22 @@ async function pintaMapaComCaminho(nodeArray) {
 }
 
 async function buscaEsferas() {
+    const titulo = document.getElementById('tituloPagina')
     while (esferasEncontradas !== 7) {
         const posicoes = randomizaInicioFimCaminho()
+        mapaSetado[posicoes.linhaFim][posicoes.colunaFim].visitado = true
         const path = astar(
             mapaSetado[19][19], 
             mapaSetado[posicoes.linhaFim][posicoes.colunaFim],
             mapaSetado
         )
         if (path.ignoraVizinho) {
-            console.log(path)
+            titulo.innerHTML = `Buscando esfera do dragão número ${path.numeroEsfera}`
             await pintaMapaComCaminho(path.caminho)
         }
     }
+
+    titulo.innerHTML = 'Todas as esferas foram encontradas!'
 }
 
 geraMapa()
