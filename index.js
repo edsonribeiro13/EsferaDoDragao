@@ -267,7 +267,47 @@ async function pintaMapaComCaminho(nodeArray) {
     return
 }
 
+/**
+ * Cria modal de anúncio
+ */
+function setModal(esferasPeso) {    
+    var modal = document.getElementById("myModal");
+    const container = document.getElementById('container')
+    var span = document.getElementsByClassName("close")[0];
+
+    function openModal() {
+        modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    for (const esfera of esferasPeso) {
+        const spanEsfera = document.createElement('span');
+        spanEsfera.textContent = `Esfera: ${esfera.esfera}`
+        container.appendChild(spanEsfera);
+
+        const spanPeso = document.createElement('span');
+        spanPeso.textContent = `Percorrido: ${esfera.peso}`
+        container.appendChild(spanPeso);
+    }
+
+    const spanTotal = document.createElement('span');
+    spanTotal.textContent = `Total percorrido: ${esferasPeso.reduce((sum, esfera) => sum + esfera.peso, 0)}`
+    container.appendChild(spanTotal);
+
+    setTimeout(() => openModal(), 3000)
+}
+
 async function buscaEsferas() {
+    const esferasPeso = []
     const titulo = document.getElementById('tituloPagina')
     while (esferasEncontradas !== 7) {
         const posicoes = randomizaInicioFimCaminho()
@@ -279,11 +319,16 @@ async function buscaEsferas() {
         )
         if (path.ignoraVizinho) {
             titulo.innerHTML = `Buscando esfera do dragão número ${path.numeroEsfera}`
+            esferasPeso.push({
+                esfera: path.numeroEsfera,
+                peso: path.caminho.reduce((sum, esfera) => sum + esfera.weight, 0)
+            })
             await pintaMapaComCaminho(path.caminho)
         }
     }
 
     titulo.innerHTML = 'Todas as esferas foram encontradas!'
+    setModal(esferasPeso)
 }
 
 geraMapa()
