@@ -139,6 +139,7 @@ class Node {
 }
 
 let esferasEncontradas = 0
+let nodeEsferasEncontradas = []
 /**
  * @satisfies realiza busca com algoritmo A*
  */
@@ -185,8 +186,9 @@ function astar(start, end, grid, ignoraVizinho) {
         const neighbors = getNeighbors(currentNode, grid);
         const neighborComEsfera = neighbors.filter(neighbor => neighbor.esfera && !neighbor.visitado)
         if (neighborComEsfera.length && !ignoraVizinho) {
+            nodeEsferasEncontradas = neighborComEsfera
             esferasEncontradas += 1
-            return astar(start, neighborComEsfera[0], mapaSetado, true)
+            return astar(start, nodeEsferasEncontradas.pop(), mapaSetado, true)
         }
         for (let neighbor of neighbors) {
             if (closedList.includes(neighbor)) {
@@ -310,12 +312,22 @@ async function buscaEsferas() {
     const esferasPeso = []
     const titulo = document.getElementById('tituloPagina')
     while (esferasEncontradas !== 7) {
-        const posicoes = randomizaInicioFimCaminho()
-        mapaSetado[posicoes.linhaFim][posicoes.colunaFim].visitado = true
+        let ignoraVizinho = false
+        let proximaBusca
+        if (nodeEsferasEncontradas.length) {
+            ignoraVizinho = true
+            proximaBusca = nodeEsferasEncontradas.pop()
+        }
+        else {
+            const posicoes = randomizaInicioFimCaminho()
+            mapaSetado[posicoes.linhaFim][posicoes.colunaFim].visitado = true
+            proximaBusca = mapaSetado[posicoes.linhaFim][posicoes.colunaFim]
+        }
         const path = astar(
             mapaSetado[19][19], 
-            mapaSetado[posicoes.linhaFim][posicoes.colunaFim],
-            mapaSetado
+            proximaBusca,
+            mapaSetado,
+            ignoraVizinho
         )
         if (path.ignoraVizinho) {
             titulo.innerHTML = `Buscando esfera do dragão número ${path.numeroEsfera}`
