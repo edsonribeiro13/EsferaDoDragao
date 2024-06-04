@@ -259,12 +259,21 @@ function heuristic(node, end) {
     return Math.abs(node.x - end.x) + Math.abs(node.y - end.y);
 }
 
-async function pintaMapaComCaminho(nodeArray) {
+async function pintaMapaComCaminho(nodeArray, numeroEsfera) {
+    let oldQuadro
     for(const node of nodeArray) {
         const quadro = document.getElementById(`${node.x}${node.y}`)
-        quadro.style.backgroundColor = '#c0504d'
+        quadro.style.backgroundImage = `url(./kidGokuNuvem.jpg)`
+        quadro.style.backgroundSize = '100% 100%'
+        if (oldQuadro) {
+            oldQuadro.style.backgroundColor = '#c0504d'
+            oldQuadro.style.backgroundImage = ''
+        }
+        oldQuadro = quadro
         await new Promise(resolve => setTimeout(resolve, 500))
     }
+
+    oldQuadro.style.backgroundImage = `url(./esfera${numeroEsfera}.jpg)`
 
     return
 }
@@ -335,7 +344,7 @@ async function buscaEsferas() {
                 esfera: path.numeroEsfera,
                 peso: path.caminho.reduce((sum, esfera) => sum + esfera.weight, 0)
             })
-            await pintaMapaComCaminho(path.caminho)
+            await pintaMapaComCaminho(path.caminho, path.numeroEsfera)
         }
     }
 
